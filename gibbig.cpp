@@ -45,6 +45,8 @@ cGibbig::cGibbig()
     m_bErrorOccured             = false;
     m_bAuthenticationInProgress = false;
 
+    m_teGibbigAction            = GA_DEFAULT;
+
 //    g_obLogger(cSeverity::DEBUG) << "Create QNetworkAccessManager" << EOM;
 
     m_gbRestManager = new QNetworkAccessManager( this );
@@ -123,15 +125,16 @@ void cGibbig::gibbigAuthenticate()
 
     m_bAuthenticationInProgress = true;
     m_gbRequest.setUrl( QUrl( QString("https://%1/unifiedid/rest/user/authenticate").arg(m_qsHost) ) );
+    m_teGibbigAction = GA_AUTHENTICATE;
     m_inTimer = startTimer( m_inTimeout );
 }
 //=================================================================================================
-void cGibbig::gibbigSendPatientCard(QString p_qsBarcode)
+void cGibbig::gibbigSendPatientCard(QString /*p_qsBarcode*/)
 //-------------------------------------------------------------------------------------------------
 {
 //    cTracer obTrace( "cGibbig::gibbigSendPatientCard" );
 
-
+    m_teGibbigAction = GA_PCREGISTER;
 }
 //=================================================================================================
 void cGibbig::timerEvent(QTimerEvent *)
@@ -143,8 +146,9 @@ void cGibbig::timerEvent(QTimerEvent *)
     m_inTimer = 0;
 
     m_qsError.append( tr("Timeout error occured during Gibbig communication after %1 milliseconds.\n").arg(m_inTimeout) );
-    m_qsError.append( tr("%1 FAILED due to timeout error.") );
+    m_qsError.append( tr("%1 FAILED due to timeout error.").arg( m_teGibbigAction.toStr() ) );
     m_bErrorOccured = true;
+    emit signalErrorOccured();
 }
 //=================================================================================================
 void cGibbig::slotRestRequestFinished(QNetworkReply *p_gbReply)
@@ -159,6 +163,7 @@ void cGibbig::slotRestRequestFinished(QNetworkReply *p_gbReply)
     {
         m_qsError.append( tr("Rest error: %1\n").arg( p_gbReply->errorString() ) );
         m_bErrorOccured = true;
+        emit signalErrorOccured();
     }
     else
     {
@@ -191,6 +196,7 @@ void cGibbig::_processMessage()
         {
             m_qsError.append( tr("Invalid format, token string not received. '%1'\n").arg(m_qsMessage) );
             m_bErrorOccured = true;
+            emit signalErrorOccured();
         }
     }
 }

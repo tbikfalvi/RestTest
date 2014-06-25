@@ -17,6 +17,8 @@ public:
 
 private slots:
     void on_pbInit_clicked();
+    void on_pbAuthenticate_clicked();
+    void on_GibbigErrorOccured();
 
 private:
     Ui::MainWindow *ui;

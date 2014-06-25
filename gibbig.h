@@ -24,6 +24,31 @@
 #include <QtNetwork/QNetworkReply>
 
 //====================================================================================
+class cGibbigAction
+{
+public:
+    enum teGibbigAction
+    {
+        GA_DEFAULT = 0,
+        GA_AUTHENTICATE,
+        GA_PCREGISTER,
+        GA_PCUSE
+    };
+
+    static const char *toStr( teGibbigAction p_enGA )
+    {
+        switch( p_enGA )
+        {
+            case GA_DEFAULT:        return "Unidentified";    break;
+            case GA_AUTHENTICATE:   return "Authenticate";   break;
+            case GA_PCREGISTER:     return "Registration"; break;
+            case GA_PCUSE:          return "CardUsage";    break;
+            default:                return "INVALID";
+        }
+    }
+};
+
+
 class cGibbig : public QObject
 {
     Q_OBJECT
@@ -45,6 +70,8 @@ public:
     void    gibbigClearError()          {   m_bErrorOccured = false;    }
     bool    gibbigIsErrorOccured()      {   return m_bErrorOccured;     }
 
+    QString gibbigErrorStr()            {   return m_qsError;           }
+
 protected:
 
     void    timerEvent( QTimerEvent *p_poEvent );
@@ -53,27 +80,33 @@ protected slots:
 
     void    slotRestRequestFinished(QNetworkReply *p_gbReply);
 
+signals:
+
+    void    signalErrorOccured();
+
 private:
 
-    QNetworkAccessManager   *m_gbRestManager;
-    QNetworkRequest          m_gbRequest;
+    QNetworkAccessManager           *m_gbRestManager;
+    QNetworkRequest                  m_gbRequest;
 
-    QString                  m_qsHost;
-    QString                  m_qsPort;
-    QString                  m_qsGbUserName;
-    QString                  m_qsGbPassword;
-    int                      m_inTimeout;
+    QString                          m_qsHost;
+    QString                          m_qsPort;
+    QString                          m_qsGbUserName;
+    QString                          m_qsGbPassword;
+    int                              m_inTimeout;
 
-    QString                  m_qsMessage;
-    QString                  m_qsError;
-    int                      m_inTimer;
+    QString                          m_qsMessage;
+    QString                          m_qsError;
+    int                              m_inTimer;
 
-    QString                  m_qsToken;
+    QString                          m_qsToken;
 
-    bool                     m_bErrorOccured;
-    bool                     m_bAuthenticationInProgress;
+    bool                             m_bErrorOccured;
+    bool                             m_bAuthenticationInProgress;
 
-    void                    _processMessage();
+    cGibbigAction::teGibbigAction    m_teGibbigAction;
+
+    void                            _processMessage();
 
 };
 //====================================================================================
