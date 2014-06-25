@@ -19,6 +19,7 @@ private slots:
     void on_pbInit_clicked();
     void on_pbAuthenticate_clicked();
     void on_GibbigErrorOccured();
+    void on_GibbigActionFinished( QString p_qsInfo );
 
 private:
     Ui::MainWindow *ui;

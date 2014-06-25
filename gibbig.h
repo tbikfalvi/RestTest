@@ -22,6 +22,7 @@
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
+#include <QDateTime>
 
 //====================================================================================
 class cGibbigAction
@@ -30,19 +31,19 @@ public:
     enum teGibbigAction
     {
         GA_DEFAULT = 0,
-        GA_AUTHENTICATE,
-        GA_PCREGISTER,
-        GA_PCUSE
+        GA_AUTHENTICATE1,
+        GA_AUTHENTICATE2,
+        GA_PCSENDDATA
     };
 
     static const char *toStr( teGibbigAction p_enGA )
     {
         switch( p_enGA )
         {
-            case GA_DEFAULT:        return "Unidentified";    break;
-            case GA_AUTHENTICATE:   return "Authenticate";   break;
-            case GA_PCREGISTER:     return "Registration"; break;
-            case GA_PCUSE:          return "CardUsage";    break;
+            case GA_DEFAULT:        return "Unidentified";  break;
+            case GA_AUTHENTICATE1:  return "Authenticate";  break;
+            case GA_AUTHENTICATE2:  return "Authenticate";  break;
+            case GA_PCSENDDATA:     return "PatientCard";  break;
             default:                return "INVALID";
         }
     }
@@ -64,12 +65,11 @@ public:
     void    setPassword( const QString p_qsPassword );
     void    setTimeout( const int p_inTimeout );
 
-    void    gibbigAuthenticate();
-    void    gibbigSendPatientCard( QString p_qsBarcode );
+    void    gibbigAuthenticate( cGibbigAction::teGibbigAction p_teGibbigAction = cGibbigAction::GA_AUTHENTICATE1 );
+    void    gibbigSendPatientCard( QString p_qsPatientCard );
 
     void    gibbigClearError()          {   m_bErrorOccured = false;    }
     bool    gibbigIsErrorOccured()      {   return m_bErrorOccured;     }
-
     QString gibbigErrorStr()            {   return m_qsError;           }
 
 protected:
@@ -83,6 +83,7 @@ protected slots:
 signals:
 
     void    signalErrorOccured();
+    void    signalActionProcessed( QString p_qsInfo );
 
 private:
 
@@ -96,10 +97,13 @@ private:
     int                              m_inTimeout;
 
     QString                          m_qsMessage;
+    QString                          m_qsInfo;
     QString                          m_qsError;
     int                              m_inTimer;
 
     QString                          m_qsToken;
+    QDateTime                        m_qdtExpiration;
+    QString                          m_qsPatientCard;
 
     bool                             m_bErrorOccured;
     bool                             m_bAuthenticationInProgress;
@@ -107,6 +111,9 @@ private:
     cGibbigAction::teGibbigAction    m_teGibbigAction;
 
     void                            _processMessage();
+    void                            _getTokenExpFromMessage();
+
+    void                            _sendPatientCardData();
 
 };
 //====================================================================================
