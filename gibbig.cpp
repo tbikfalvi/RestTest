@@ -45,7 +45,7 @@ cGibbig::cGibbig()
     m_bErrorOccured             = false;
     m_bAuthenticationInProgress = false;
 
-    m_teGibbigAction            = GA_DEFAULT;
+    m_teGibbigAction            = cGibbigAction::GA_DEFAULT;
 
 //    g_obLogger(cSeverity::DEBUG) << "Create QNetworkAccessManager" << EOM;
 
@@ -125,7 +125,7 @@ void cGibbig::gibbigAuthenticate()
 
     m_bAuthenticationInProgress = true;
     m_gbRequest.setUrl( QUrl( QString("https://%1/unifiedid/rest/user/authenticate").arg(m_qsHost) ) );
-    m_teGibbigAction = GA_AUTHENTICATE;
+    m_teGibbigAction = cGibbigAction::GA_AUTHENTICATE;
     m_inTimer = startTimer( m_inTimeout );
 }
 //=================================================================================================
@@ -134,7 +134,7 @@ void cGibbig::gibbigSendPatientCard(QString /*p_qsBarcode*/)
 {
 //    cTracer obTrace( "cGibbig::gibbigSendPatientCard" );
 
-    m_teGibbigAction = GA_PCREGISTER;
+    m_teGibbigAction = cGibbigAction::GA_PCREGISTER;
 }
 //=================================================================================================
 void cGibbig::timerEvent(QTimerEvent *)
@@ -146,7 +146,7 @@ void cGibbig::timerEvent(QTimerEvent *)
     m_inTimer = 0;
 
     m_qsError.append( tr("Timeout error occured during Gibbig communication after %1 milliseconds.\n").arg(m_inTimeout) );
-    m_qsError.append( tr("%1 FAILED due to timeout error.").arg( m_teGibbigAction.toStr() ) );
+    m_qsError.append( tr("%1 FAILED due to timeout error.").arg( cGibbigAction::toStr( m_teGibbigAction ) ) );
     m_bErrorOccured = true;
     emit signalErrorOccured();
 }
