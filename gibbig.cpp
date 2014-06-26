@@ -133,13 +133,36 @@ void cGibbig::gibbigAuthenticate( cGibbigAction::teGibbigAction p_teGibbigAction
     m_inTimer = startTimer( m_inTimeout );
 }
 //=================================================================================================
-void cGibbig::gibbigSendPatientCard(QString p_qsPatientCard)
+void cGibbig::gibbigPCRegister(QString p_qsPatientCard)
 //-------------------------------------------------------------------------------------------------
 {
-//    cTracer obTrace( "cGibbig::gibbigSendPatientCard" );
-
     m_qsPatientCard = p_qsPatientCard;
-    gibbigAuthenticate( cGibbigAction::GA_AUTHENTICATE2 );
+
+    if( QDateTime::currentDateTime() < m_qdtExpiration )
+    {
+        m_teGibbigAction = cGibbigAction::GA_PCREGISTER;
+        _sendPatientCardData();
+    }
+    else
+    {
+        gibbigAuthenticate( cGibbigAction::GA_AUTHENTICATE2 );
+    }
+}
+//=================================================================================================
+void cGibbig::gibbigPCUse(QString p_qsPatientCard)
+//-------------------------------------------------------------------------------------------------
+{
+    m_qsPatientCard = p_qsPatientCard;
+
+    if( QDateTime::currentDateTime() < m_qdtExpiration )
+    {
+        m_teGibbigAction = cGibbigAction::GA_PCUSE;
+        _sendPatientCardData();
+    }
+    else
+    {
+        gibbigAuthenticate( cGibbigAction::GA_AUTHENTICATE3 );
+    }
 }
 //=================================================================================================
 void cGibbig::timerEvent(QTimerEvent *)
@@ -149,10 +172,10 @@ void cGibbig::timerEvent(QTimerEvent *)
 
     killTimer( m_inTimer );
     m_inTimer = 0;
-    m_teGibbigAction = cGibbigAction::GA_DEFAULT;
 
     m_qsError.append( tr("Timeout error occured during Gibbig communication after %1 milliseconds.\n").arg(m_inTimeout) );
     m_qsError.append( tr("%1 FAILED due to timeout error.").arg( cGibbigAction::toStr( m_teGibbigAction ) ) );
+    m_teGibbigAction = cGibbigAction::GA_DEFAULT;
     m_bErrorOccured = true;
     emit signalErrorOccured();
 }
@@ -188,6 +211,7 @@ void cGibbig::_processMessage()
     {
         case cGibbigAction::GA_AUTHENTICATE1:
         case cGibbigAction::GA_AUTHENTICATE2:
+        case cGibbigAction::GA_AUTHENTICATE3:
         {
             if( m_qsMessage.left(10).compare( "{\"token\":\"" ) == 0 )
             {
@@ -200,6 +224,12 @@ void cGibbig::_processMessage()
                 }
                 else if( cGibbigAction::GA_AUTHENTICATE2 )
                 {
+                    m_teGibbigAction = cGibbigAction::GA_PCREGISTER;
+                    _sendPatientCardData();
+                }
+                else if( cGibbigAction::GA_AUTHENTICATE3 )
+                {
+                    m_teGibbigAction = cGibbigAction::GA_PCUSE;
                     _sendPatientCardData();
                 }
             }
@@ -213,7 +243,12 @@ void cGibbig::_processMessage()
             break;
         }
 
-        case cGibbigAction::GA_PCSENDDATA:
+        case cGibbigAction::GA_PCREGISTER:
+        {
+            break;
+        }
+
+        case cGibbigAction::GA_PCUSE:
         {
             break;
         }
@@ -229,7 +264,21 @@ void cGibbig::_processMessage()
 void cGibbig::_sendPatientCardData()
 //-------------------------------------------------------------------------------------------------
 {
-    m_teGibbigAction = cGibbigAction::GA_PCSENDDATA;
+    QString qsBarcode = _getBarcode();
+    QString qsMessage = "";
+
+    switch( m_teGibbigAction )
+    {
+        case cGibbigAction::GA_PCREGISTER:
+            qsMessage.append( "{\"transaction\":\"grant\",\"masterCoupons\":" );
+            break;
+
+        case cGibbigAction::GA_PCUSE:
+            qsMessage.append( "{\"transaction\":\"use\",\"masterCoupons\":" );
+            break;
+    }
+
+    m_gbRequest.setUrl( QUrl( QString("https://%1/unifiedid/rest/vendor/coupons/sync/%2?token=%3").arg(m_qsHost).arg(qsBarcode).arg(m_qsToken) ) );
 }
 //=================================================================================================
 void cGibbig::_getTokenExpFromMessage()
@@ -252,5 +301,15 @@ void cGibbig::_getTokenExpFromMessage()
     qsExpiration    = qslTemp.at(1);
     qsExpiration.remove('}');
     m_qdtExpiration.setTime_t( qsExpiration.toInt() );
+}
+//=================================================================================================
+QString cGibbig::_getBarcode()
+//-------------------------------------------------------------------------------------------------
+{
+    QString qsBarcode;
+
+
+
+    return qsBarcode;
 }
 //=================================================================================================
