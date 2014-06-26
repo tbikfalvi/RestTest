@@ -19,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->ledUser->setText( "tbikfalvi@gmail.com" );
     ui->ledPassword->setText( "bikfa14ta" );
     ui->ledTimeout->setText( "10" );
+    ui->tePatientCard->setText( "1234#2014-12-31#7/2014-12-31|7/2014-12-31|7/2014-12-31|7/2014-12-31|7/2014-12-31|7/2014-12-31|7/2014-10-15|7/2014-10-15|7/2014-10-15" );
 }
 
 MainWindow::~MainWindow()
@@ -53,3 +54,21 @@ void MainWindow::on_GibbigActionFinished(QString p_qsInfo)
     ui->teInfo->append( p_qsInfo );
 }
 
+
+void MainWindow::on_pbPCRegister_clicked()
+{
+    ui->teInfo->append( "Register patientcard" );
+    g_poGibbig->gibbigPCRegister( ui->tePatientCard->toPlainText() );
+}
+
+void MainWindow::on_pbPCRefill_clicked()
+{
+    ui->teInfo->append( "Refill patientcard" );
+    g_poGibbig->gibbigPCRefill( ui->tePatientCard->toPlainText() );
+}
+
+void MainWindow::on_pbPCUse_clicked()
+{
+    ui->teInfo->append( "Use patientcard" );
+    g_poGibbig->gibbigPCUse( ui->tePatientCard->toPlainText() );
+}

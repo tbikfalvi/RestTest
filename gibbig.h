@@ -34,7 +34,9 @@ public:
         GA_AUTHENTICATE1,
         GA_AUTHENTICATE2,
         GA_AUTHENTICATE3,
+        GA_AUTHENTICATE4,
         GA_PCREGISTER,
+        GA_PCREFILL,
         GA_PCUSE
     };
 
@@ -46,7 +48,9 @@ public:
             case GA_AUTHENTICATE1:  return "Authenticate";              break;
             case GA_AUTHENTICATE2:  return "Authenticate";              break;
             case GA_AUTHENTICATE3:  return "Authenticate";              break;
+            case GA_AUTHENTICATE4:  return "Authenticate";              break;
             case GA_PCREGISTER:     return "PatientCardRegistration";   break;
+            case GA_PCREFILL:       return "PatientCardRefill";         break;
             case GA_PCUSE:          return "PatientCardUsage";          break;
             default:                return "INVALID";
         }
@@ -71,6 +75,7 @@ public:
 
     void    gibbigAuthenticate( cGibbigAction::teGibbigAction p_teGibbigAction = cGibbigAction::GA_AUTHENTICATE1 );
     void    gibbigPCRegister( QString p_qsPatientCard );
+    void    gibbigPCRefill( QString p_qsPatientCard );
     void    gibbigPCUse( QString p_qsPatientCard );
 
     void    gibbigClearError()          {   m_bErrorOccured = false;    }
