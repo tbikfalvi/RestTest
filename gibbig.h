@@ -78,9 +78,9 @@ public:
     void    gibbigPCRefill( QString p_qsPatientCard );
     void    gibbigPCUse( QString p_qsPatientCard );
 
-    void    gibbigClearError()          {   m_bErrorOccured = false;    }
-    bool    gibbigIsErrorOccured()      {   return m_bErrorOccured;     }
-    QString gibbigErrorStr()            {   return m_qsError;           }
+    void    gibbigClearError()          {   m_bErrorOccured = false; m_qsError = "";    }
+    bool    gibbigIsErrorOccured()      {   return m_bErrorOccured;                     }
+    QString gibbigErrorStr()            {   return m_qsError;                           }
 
 protected:
 
@@ -94,6 +94,7 @@ signals:
 
     void    signalErrorOccured();
     void    signalActionProcessed( QString p_qsInfo );
+    void    signalDebugMessage(QString p_qsMessage);
 
 private:
 
@@ -124,6 +125,7 @@ private:
     void                            _getTokenExpFromMessage();
     void                            _sendPatientCardData();
     QString                         _getBarcode();
+    QString                         _getUnits();
 
 };
 //====================================================================================

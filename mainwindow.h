@@ -23,6 +23,7 @@ private slots:
     void on_pbPCRegister_clicked();
     void on_pbPCRefill_clicked();
     void on_pbPCUse_clicked();
+    void on_GibbigMessageArrived(QString p_qsMessage);
 
 private:
     Ui::MainWindow *ui;

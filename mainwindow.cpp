@@ -14,12 +14,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     connect( g_poGibbig, SIGNAL(signalErrorOccured()), this, SLOT(on_GibbigErrorOccured()) );
     connect( g_poGibbig, SIGNAL(signalActionProcessed(QString)), this, SLOT(on_GibbigActionFinished(QString)) );
+    connect( g_poGibbig, SIGNAL(signalDebugMessage(QString)), this, SLOT(on_GibbigMessageArrived(QString)) );
 
-    ui->ledServer->setText( "54.225.88.121" );
-    ui->ledUser->setText( "tbikfalvi@gmail.com" );
-    ui->ledPassword->setText( "bikfa14ta" );
+    ui->ledServer->setText( "54.204.17.86" );
+    ui->ledUser->setText( "kiwi@gibbig.co" );
+    ui->ledPassword->setText( "1234" );
     ui->ledTimeout->setText( "10" );
-    ui->tePatientCard->setText( "1234#2014-12-31#7/2014-12-31|7/2014-12-31|7/2014-12-31|7/2014-12-31|7/2014-12-31|7/2014-12-31|7/2014-10-15|7/2014-10-15|7/2014-10-15" );
+    ui->tePatientCard->setText( "1234#2014-06-31#5/7/2014-06-31" );
 }
 
 MainWindow::~MainWindow()
@@ -71,4 +72,9 @@ void MainWindow::on_pbPCUse_clicked()
 {
     ui->teInfo->append( "Use patientcard" );
     g_poGibbig->gibbigPCUse( ui->tePatientCard->toPlainText() );
+}
+
+void MainWindow::on_GibbigMessageArrived(QString p_qsMessage)
+{
+    ui->teInfo->append( p_qsMessage );
 }
